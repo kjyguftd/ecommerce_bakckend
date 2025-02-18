@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 // Main application class ro run the application
 @SpringBootApplication
 @EnableDiscoveryClient
-//@EnableFeignClients(basePackages = "com.example.user_service.client")
+@EnableFeignClients(basePackages = "com.example.user_service.client")
 public class Application {
 
 	// Main method to run the application

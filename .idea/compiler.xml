@@ -4,5 +4,13 @@
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ecommerce_backend.application" target="23" />
+      <module name="ecommerce_backend.application.main" target="23" />
+      <module name="ecommerce_backend.application.test" target="23" />
+      <module name="ecommerce_backend.user-service" target="23" />
+      <module name="ecommerce_backend.user-service.main" target="23" />
+      <module name="ecommerce_backend.user-service.test" target="23" />
+    </bytecodeTargetLevel>
   </component>
 </project>

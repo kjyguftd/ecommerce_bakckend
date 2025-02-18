@@ -8,7 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients
-@EnableDiscoveryClient
+//@EnableDiscoveryClient
 public class UserServiceApplication {
 
 	public static void main(String[] args) {
