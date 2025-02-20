@@ -7,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import com.example.application.cart.CartItem;
+import com.example.application.cart.CartRepository;
+import com.example.application.cart.CartService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,73 +35,29 @@ class CartServiceTest {
     }
 
     @Test
-    void calculateTotalPrice() {
-        Cart cart = new Cart();
-        cart.addItem(new CartItem(1L, 2));
-        cart.addItem(new CartItem(2L, 1));
+    void getAllItemsByUserIdTest()
+    {
+        CartItem cartItem1 = new CartItem(1L,900L,300L,2,1);
+        CartItem cartItem2 = new CartItem(2L,900L,301L,2,1);
+        CartItem cartItem3 = new CartItem(3L,901L,301L,3,1);
+        CartItem cartItem4 = new CartItem(4L,901L,303L,10,1);
 
-        Product product1 = new Product(1L, "Product 1", 10.0);
-        Product product2 = new Product(2L, "Product 2", 20.0);
+        Product product1 = new Product(300L, "Product 1", 10.0);
+        Product product2 = new Product(3001L, "Product 2", 20.0);
+        Product product3 = new Product(3003L, "Product 2", 20.0);
 
-        when(productRepository.findAllById(anyList())).thenReturn(Arrays.asList(product1, product2));
+        when(productRepository.findById(300L)).thenReturn(Optional.of(product1));
+        when(productRepository.findById(301L)).thenReturn(Optional.of(product2));
+        when(productRepository.findById(303L)).thenReturn(Optional.of(product3));
 
-        double totalPrice = cartService.calculateTotalPrice(cart);
+        when(cartRepository.findAllByUserId(900L)).thenReturn(Arrays.asList(cartItem1, cartItem2));
+        when(cartRepository.findAllByUserId(900L)).thenReturn(Arrays.asList(cartItem3, cartItem4));
 
-        assertEquals(40.0, totalPrice);
+        double totalPrice1 = cartService.calculateTotalPrice(900L);
+        double totalPrice2 = cartService.calculateTotalPrice(901L);
+
+        assertEquals(60.0, totalPrice1);
+        assertEquals(260.0, totalPrice2);
     }
 
-    @Test
-    void getAllItems() {
-        Cart cart = new Cart();
-        cart.addItem(new CartItem(1L, 2));
-        cart.addItem(new CartItem(2L, 1));
-
-        when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
-
-        List<CartItem> items = cartService.getAllItems(1L);
-
-        assertEquals(2, items.size());
-    }
-
-    @Test
-    void addItemToCart() {
-        Cart cart = new Cart();
-        CartItem newItem = new CartItem(1L, 2);
-
-        when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
-        when(cartRepository.save(any(Cart.class))).thenReturn(cart);
-
-        Cart updatedCart = cartService.addItemToCart(1L, newItem);
-
-        assertEquals(1, updatedCart.getItems().size());
-        assertEquals(newItem, updatedCart.getItems().get(0));
-    }
-
-    @Test
-    void removeItemFromCart() {
-        Cart cart = new Cart();
-        CartItem item = new CartItem(1L, 2);
-        cart.addItem(item);
-
-        when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
-        when(cartRepository.save(any(Cart.class))).thenReturn(cart);
-
-        Cart updatedCart = cartService.removeItemFromCart(1L, 1L);
-
-        assertTrue(updatedCart.getItems().isEmpty());
-    }
-
-    @Test
-    void emptyCart() {
-        Cart cart = new Cart();
-        cart.addItem(new CartItem(1L, 2));
-        cart.addItem(new CartItem(2L, 1));
-
-        when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
-        when(cartRepository.save(any(Cart.class))).thenReturn(cart);
-
-        cartService.emptyCart(1L);
-
-        assertTrue(cart.getItems().isEmpty());
-    }
 }

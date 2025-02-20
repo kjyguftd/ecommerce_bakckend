@@ -1,7 +1,12 @@
 package com.example.application.cart;
 
+import com.example.user_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+import com.example.application.response.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -18,47 +23,162 @@ public class CartController {
         this.cartRepository = cartRepository;
     }
 
-    @PostMapping
-    public Cart createCart() {
-        Cart cart = new Cart();
-        return cartRepository.save(cart);
+    //根据用户Id获取购物车
+    @GetMapping("/{userid}")
+    public ResponseEntity<?> getCart(@PathVariable Long userid) {
+        if(cartService.existUserId(userid)) {
+            List<CartItem> items = cartService.getAllItemsByUserId(userid);
+            return new ResponseEntity<>(items, HttpStatus.OK);
+        }
+        else{
+            // 处理异常并返回错误信息
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "UserId Not Found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+
+        }
     }
 
-    @GetMapping("/{id}")
-    public Cart getCart(@PathVariable Long id) {
-        return cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart not found"));
+    //加购一个商品
+    @PostMapping("/additem/{userid}")
+    public ResponseEntity<?> addItemToCart(@PathVariable Long userid, @RequestBody CartItem item) {
+        if(!cartService.existUserId(userid)){
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "UserId Not Found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        try {
+            cartService.addItem(userid, item);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR
+                    .value(), "An unexpected error occurred: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @PostMapping("/{id}/items")
-    public Cart addItemToCart(@PathVariable Long id, @RequestBody CartItem item) {
-        Cart cart = cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart not found"));
-        cart.addItem(item);
-        return cartRepository.save(cart);
+    //勾选or取消勾选一个商品
+    @PatchMapping("/checkitem/{id}/{check}")
+    public ResponseEntity<?> CheckItem(@PathVariable Long id,@PathVariable int check)
+    {
+        if(!cartService.existCartItem(id))
+        {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "CartItem Not Found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        try{
+            cartService.checkItem(id,check);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR
+                    .value(), "An unexpected error occurred: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @DeleteMapping("/{id}/items/{productId}")
-    public Cart removeItemFromCart(@PathVariable Long id, @PathVariable Long productId) {
-        Cart cart = cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart not found"));
-        cart.removeItem(productId);
-        return cartRepository.save(cart);
+    //勾选or取消勾选全部商品
+    @PatchMapping("/checkitems/{userid}/{check}")
+    public ResponseEntity<?> CheckAllItem(@PathVariable Long userid,@PathVariable int check)
+    {
+        if(!cartService.existUserId(userid))
+        {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "User Not Found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        try{
+            cartService.checkAllItems(userid,check);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR
+                    .value(), "An unexpected error occurred: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @GetMapping("/{id}/total")
-    public double getTotalPrice(@PathVariable Long id) {
-        Cart cart = cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart not found"));
-        return cartService.calculateTotalPrice(cart);
+    //移除一个商品
+    @DeleteMapping("/removeitem/{id}")
+    public ResponseEntity<?>  removeItem(@PathVariable Long id) {
+        if(!cartService.existCartItem(id))
+        {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "CartItem Not Found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        try{
+            cartService.removeItem(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR
+                    .value(), "An unexpected error occurred: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @PostMapping("/{id}/empty")
-    public Cart emptyCart(@PathVariable Long id) {
-        Cart cart = cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart not found"));
-        cart.emptyCart();
-        return cartRepository.save(cart);
+    //移除所有商品
+    @DeleteMapping("/removeitems/{userid}")
+    public ResponseEntity<?>  removeAllItems(@PathVariable Long userid) {
+        if(!cartService.existUserId(userid))
+        {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "User Not Found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        try{
+            cartService.removeAllItems(userid);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR
+                    .value(), "An unexpected error occurred: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @GetMapping("/{id}/items")
-    public List<CartItem> getAllItems(@PathVariable Long id) {
-        Cart cart = cartRepository.findById(id).orElseThrow(() -> new RuntimeException("Cart not found"));
-        return cart.getAllItems();
+    //计算购物车商品总价
+    @GetMapping("/total/{userid}")
+    public ResponseEntity<?>  getTotalPrice(@PathVariable Long userid) {
+        if(!cartService.existUserId(userid))
+        {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "User Not Found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        try{
+            double totalPrice = cartService.calculateTotalPrice(userid);
+            return new ResponseEntity<>(totalPrice, HttpStatus.OK);
+        }
+        catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR
+                    .value(), "An unexpected error occurred: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
+    //计算购物车商品总价
+    @GetMapping("/checkedsum/{userid}")
+    public ResponseEntity<?>  getCheckedPrice(@PathVariable Long userid) {
+        if(!cartService.existUserId(userid))
+        {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "User Not Found");
+            return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        }
+
+        try{
+            double checkedPrice = cartService.calculateCheckedPrice(userid);
+            return new ResponseEntity<>(checkedPrice, HttpStatus.OK);
+        }
+        catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR
+                    .value(), "An unexpected error occurred: " + e.getMessage());
+            return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    //todo:勾选商品下单
+
 }
