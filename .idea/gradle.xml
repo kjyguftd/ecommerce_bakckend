@@ -4,17 +4,20 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../../gradle-8.12.1-bin/gradle-8.12.1" />
+        <option name="gradleJvm" value="23" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/discovery-service" />
           </set>
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/application" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="23" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/application" />
@@ -24,7 +27,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/discovery-service" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="23" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/discovery-service" />
@@ -33,7 +36,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/user-service" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="23" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/user-service" />
