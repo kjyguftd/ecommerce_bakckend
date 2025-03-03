@@ -1,6 +1,9 @@
 package com.example.application.product;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+import java.util.List;
 
 @Entity
 public class Product {
@@ -11,21 +14,42 @@ public class Product {
     private Double price;
     private String description;
     private String picture;
-    private String category;
     private int stock;
+    private int categoryId;
+    private String subtitle;
+    private String subPicture;
+    private int status;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+
+
 
     public Product() {
 
     }
 
-    public Product(Double price, Long id, String name, String description, String picture, String category, int stock) {
-        this.price = price;
+    @PrePersist
+    protected void onCreate() {
+        this.createTime = LocalDateTime.now();
+        this.updateTime = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updateTime = LocalDateTime.now();
+    }
+
+    public Product(Long id, String name, Double price, String description, String picture, int categoryId, int stock, String subtitle, String subPicture, int status) {
         this.id = id;
         this.name = name;
+        this.price = price;
         this.description = description;
         this.picture = picture;
-        this.category = category;
+        this.categoryId = categoryId;
         this.stock = stock;
+        this.subtitle = subtitle;
+        this.subPicture = subPicture;
+        this.status = status;
     }
 
     public Product(long l, String s, double v) {
@@ -74,12 +98,12 @@ public class Product {
         this.picture = picture;
     }
 
-    public String getCategory() {
-        return category;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
     public int getStock() {
@@ -88,5 +112,45 @@ public class Product {
 
     public void setStock(int stock) {
         this.stock = stock;
+    }
+
+    public String getSubtitle() {
+        return subtitle;
+    }
+
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
+    }
+
+    public String getSubPicture() {
+        return subPicture;
+    }
+
+    public void setSubPicture(String subPicture) {
+        this.subPicture = subPicture;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
     }
 }

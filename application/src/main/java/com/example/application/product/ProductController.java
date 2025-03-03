@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -41,8 +44,34 @@ public class ProductController {
         return productService.getProductStock(id);
     }
 
+
     @GetMapping
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
+    public Page<Product> getAllProducts(Pageable pageable) {
+        return productService.getAllProducts(pageable);
+    }
+
+
+    @GetMapping("/search")
+    public Page<Product> searchProducts(@RequestParam String name, Pageable pageable) {
+        return productService.findProductsByName(name, pageable);
+    }
+
+
+    @GetMapping("/search/price")
+    public Page<Product> searchByPriceRange(@RequestParam Double minPrice, @RequestParam Double maxPrice, Pageable pageable) {
+        return productService.findProductsByPriceRange(minPrice, maxPrice, pageable);
+    }
+
+
+    @GetMapping("/category/{categoryId}")
+    public Page<Product> getProductsByCategory(@PathVariable int categoryId, Pageable pageable) {
+        return productService.findProductsByCategory(categoryId, pageable);
+    }
+
+
+
+    @GetMapping("/available")
+    public Page<Product> getAvailableProducts(Pageable pageable) {
+        return productService.findAvailableProducts(pageable);
     }
 }

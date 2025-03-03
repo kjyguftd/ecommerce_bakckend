@@ -8,6 +8,5 @@
 rootProject.name = 'ecommerce_backend'
 //include 'application'
 //include 'user-service'
-include 'discovery-service'
 //
 //project(':user-service').projectDir = file('user-service')
